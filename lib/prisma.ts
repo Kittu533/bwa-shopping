@@ -1,20 +1,10 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient } from "@prisma/client";
 
-let prisma: PrismaClient
-// Use globalThis to prevent multiple instances in development mode
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-declare const globalThis: {
-    prisma: PrismaClient
-}
+export const prisma =
+    globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV === "production") {
-    prisma = new PrismaClient()
-} else {
-    if (!globalThis.prisma) {
-        globalThis.prisma = new PrismaClient()
-    }
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-    prisma = globalThis.prisma
-}
-
-export default prisma
+export default prisma;
