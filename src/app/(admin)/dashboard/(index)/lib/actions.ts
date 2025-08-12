@@ -9,7 +9,6 @@ export async function Logout(
     _: unknown,
     formData: FormData,
 ): Promise<actionResult> {
-    console.log('logout'); 'logout'
 
     const { session } = await validateRequest();
 

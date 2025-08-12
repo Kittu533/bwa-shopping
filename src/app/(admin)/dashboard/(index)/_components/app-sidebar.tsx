@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
     IconArchive,
     IconBox,
@@ -8,18 +8,17 @@ import {
     IconDashboard,
     IconMap,
     IconUser,
+} from "@tabler/icons-react";
 
-} from "@tabler/icons-react"
-
-import { NavMain } from "@/components/nav-main"
+import { NavMain } from "@/components/nav-main";
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarMenu,
-} from "@/components/ui/sidebar"
-import { NavUser } from "./nav-user"
+} from "@/components/ui/sidebar";
+import { NavUser } from "./nav-user";
 
 const data = {
     user: {
@@ -28,46 +27,20 @@ const data = {
         avatar: "/avatars/shadcn.jpg",
     },
     navMain: [
-        {
-            title: "Dashboard",
-            url: "/",
-            icon: IconDashboard,
-        },
-        {
-            title: "Categories",
-            url: "dashboard/categories",
-            icon: IconArchive,
-        },
-        {
-            title: "Location",
-            url: "dashboard/location",
-            icon: IconMap,
-        },
-        {
-            title: "Brands",
-            url: "dashboard/brands",
-            icon: IconBuilding,
-        },
-        {
-            title: "Orders",
-            url: "dashboard/orders",
-            icon: IconBox,
-        },
-        {
-            title: "Customers",
-            url: "dashboard/customers",
-            icon: IconUser,
-        },
-
+        { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
+        { title: "Categories", url: "/dashboard/categories", icon: IconArchive },
+        { title: "Location", url: "/dashboard/location", icon: IconMap },
+        { title: "Brands", url: "/dashboard/brands", icon: IconBuilding },
+        { title: "Orders", url: "/dashboard/orders", icon: IconBox },
+        { title: "Customers", url: "/dashboard/customers", icon: IconUser },
     ],
-}
+};
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="offcanvas" {...props}>
             <SidebarHeader>
-                <SidebarMenu>
-                </SidebarMenu>
+                <SidebarMenu>{/* logo/brand di sini kalau perlu */}</SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
@@ -76,5 +49,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <NavUser user={data.user} />
             </SidebarFooter>
         </Sidebar>
-    )
+    );
 }

@@ -1,14 +1,4 @@
-import { ReactNode } from 'react';
-
-type LayoutProps = {
-    children: ReactNode;
-};
-
-export default function Layout({ children }: LayoutProps) {
-    // layout implementation
-    return (
-        <div>
-            {children}
-        </div>
-    );
+// admin/dashboard/(index)/page.tsx
+export default function Page() {
+    return <div>Welcome to the dashboard</div>;
 }

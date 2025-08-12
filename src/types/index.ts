@@ -1,3 +1,5 @@
 export type actionResult = {
-    error: string
+    success?: boolean
+    message?: string
+    error?: string
 }

@@ -22,3 +22,17 @@ export const schemaSignin = z.object({
         })
         .min(6, { error: "Password must be at least 6 characters long" }),
 });
+
+
+export const schemaCategory = z.object({
+    name: z
+        .string({
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Name is required"
+                    : "Name must be a string",
+        })
+        .trim()
+        .min(1, { error: "Name is required" }) // tangani empty string ""
+        .max(50, { error: "Name must be at most 50 characters long" }),
+})
