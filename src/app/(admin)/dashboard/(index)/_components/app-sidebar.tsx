@@ -29,7 +29,7 @@ const data = {
     navMain: [
         { title: "Dashboard", url: "/dashboard", icon: IconDashboard },
         { title: "Categories", url: "/dashboard/categories", icon: IconArchive },
-        { title: "Location", url: "/dashboard/location", icon: IconMap },
+        { title: "Location", url: "/dashboard/locations", icon: IconMap },
         { title: "Brands", url: "/dashboard/brands", icon: IconBuilding },
         { title: "Orders", url: "/dashboard/orders", icon: IconBox },
         { title: "Customers", url: "/dashboard/customers", icon: IconUser },

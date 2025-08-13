@@ -44,6 +44,7 @@ export function ReusableDialog({
     loading = false,
 }: ReusableDialogProps) {
     const [state, formAction] = useActionState(postCategory, initialState)
+    
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
