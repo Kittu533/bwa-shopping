@@ -1,7 +1,7 @@
 'use server'
 import prisma from "../../../../../../../lib/prisma";
 
-export async function getBrands() {
+export async function getBrands(): Promise<Array<{ id: number; name: string; logo: string }>> {
     try {
         const brands = await prisma.brand.findMany({
             select: { id: true, name: true, logo: true },

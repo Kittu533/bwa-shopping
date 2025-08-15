@@ -7,6 +7,7 @@ import {
     IconBuilding,
     IconDashboard,
     IconMap,
+    IconTrolley,
     IconUser,
 } from "@tabler/icons-react";
 
@@ -19,7 +20,25 @@ import {
     SidebarMenu,
 } from "@/components/ui/sidebar";
 import { NavUser } from "./nav-user";
-
+// import prisma from "../../../../../../lib/prisma";
+// import { validateRequest } from "@/lib/auth";
+// mengambil data user dan navMain
+// async function getUserData() {
+//     const { session } = await validateRequest();
+//     if (!session?.user?.email) return null;
+//     const user = await prisma.user.findUnique({
+//         where: { email: session.user.email },
+//         select: {
+//             name: true,
+//             email: true,
+//         },
+//     });
+//     if (!user) return null;
+//     return {
+//         name: user.name,
+//         email: user.email,
+//     };
+// }
 const data = {
     user: {
         name: "shadcn",
@@ -31,7 +50,8 @@ const data = {
         { title: "Categories", url: "/dashboard/categories", icon: IconArchive },
         { title: "Location", url: "/dashboard/locations", icon: IconMap },
         { title: "Brands", url: "/dashboard/brands", icon: IconBuilding },
-        { title: "Orders", url: "/dashboard/orders", icon: IconBox },
+        { title: "Products", url: "/dashboard/products", icon: IconBox },
+        { title: "Orders", url: "/dashboard/orders", icon: IconTrolley },
         { title: "Customers", url: "/dashboard/customers", icon: IconUser },
     ],
 };

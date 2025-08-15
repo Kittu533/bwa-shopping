@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
+    IconChevronDown,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
@@ -33,6 +34,8 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
+
+import { toast } from "sonner"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -64,21 +67,21 @@ import {
     TabsContent,
 
 } from "@/components/ui/tabs"
-import { ReusableDialog } from "../../_components/ReusableDialog"
+import Link from "next/link"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/supabase"
-import { toast } from "sonner"
-import { deleteBrand, postBrand, updateBrand } from "../lib/actions"
-import { getBrands } from "../lib/data"
+import { getProducts } from "../lib/data"
+import { deleteProduct } from "../lib/actions"
 
 export const schema = z.object({
     id: z.number(),
     name: z.string(),
-    logo: z.string().url(),
+    brand: z.string(),
+    category: z.string(),
+    price: z.number(),
+    stock: z.string(),          // ubah ke string
+    images: z.array(z.string()), // ubah ke array
 })
-
-
-
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
     const { transform, transition, setNodeRef, isDragging } = useSortable({
@@ -105,7 +108,6 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
     )
 }
 
-
 export function DataTable({
     data: initialData,
 
@@ -113,99 +115,10 @@ export function DataTable({
     data: z.infer<typeof schema>[]
 }) {
     // 
+    const [data, setData] = React.useState(initialData);
+
     const [loading, setLoading] = React.useState(false);
-    const [data, setData] = React.useState(() => initialData)
-    const [editDialogOpen, setEditDialogOpen] = React.useState(false);
-    const [editData, setEditData] = React.useState<{ id: number; name: string; logo: string } | null>(null);
-
-    const [editPreview, setEditPreview] = React.useState<string | null>(null);
-
-
-    // Tambahkan handleSubmit brand name dan image di sini
-
-    // handleEditSubmit Kategori disini 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setLoading(true);
-        const formData = new FormData(e.currentTarget);
-
-        try {
-            const result = await postBrand(null, formData);
-            if (result?.error) {
-                toast.error(result.error);
-            } else {
-                toast.success('Brand berhasil ditambahkan!');
-                const newData = await getBrands();
-                setData(newData);
-            }
-        } catch (error) {
-            console.error('Client call postBrand failed:', error);
-            toast.error('Terjadi kesalahan tak terduga saat mengirim data.');
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    function handleEditOpen(brand: { id: number; name: string; logo: string }) {
-        setEditData(brand);
-        setEditPreview(getImageUrl(brand.logo));
-        setEditDialogOpen(true);
-    }
-
-    function handleEditImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
-        if (file) {
-            setEditPreview(URL.createObjectURL(file));
-        } else {
-            // Kalau user clear file, tampilkan logo lama
-            if (editData?.logo) {
-                setEditPreview(getImageUrl(editData.logo));
-            } else {
-                setEditPreview(null);
-            }
-        }
-    }
-
-    // handleEditSubmit Kategori disini
-    async function handleEditSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setLoading(true);
-        const formData = new FormData(e.currentTarget);
-
-        // Pastikan id input file sesuai dengan name="image"
-        const imageInput = (e.currentTarget.elements.namedItem('image') as HTMLInputElement);
-        if (imageInput && imageInput.files && imageInput.files.length === 0) {
-            formData.delete('image');
-        }
-
-        const result = await updateBrand(null, formData, editData?.id);
-        setLoading(false);
-
-        if (result?.error) {
-            toast.error(result.error);
-        } else {
-            toast.success("Brand berhasil diubah!");
-            const newData = await getBrands();
-            setData(newData);
-        }
-    }
-
-    // handleDelete Brands 
-    async function handleDelete(id: number) {
-        setLoading(true);
-        const result = await deleteBrand(null, new FormData(), id);
-        setLoading(false);
-
-        if (result?.error) {
-            toast.error(result.error);
-        } else {
-            toast.success("Brand berhasil dihapus!");
-            // Fetch ulang data setelah berhasil hapus
-            const newData = await getBrands();
-            setData(newData);
-        }
-    }
-
+    const [editData, setEditData] = React.useState<{ id: number; name: string } | null>(null);
 
     // Kolom actions harus di-DEFINISIKAN DI DALAM KOMPONEN agar bisa akses state!
     const columns: ColumnDef<z.infer<typeof schema>>[] = [
@@ -216,10 +129,37 @@ export function DataTable({
         },
         {
             id: "name",
-            header: "Nama Kategori",
+            header: "Lokasi",
+            cell: ({ row }) => <span>{row.original.name}</span>,
+        },
+        {
+            id: "category",
+            header: "Kategori",
+            cell: ({ row }) => <span>{row.original.category}</span>,
+        },
+        {
+            id: "price",
+            header: "Harga",
+            cell: ({ row }) => <span>{row.original.price}</span>,
+        },
+        {
+            id: "stock",
+            header: "Stok",
+            cell: ({ row }) => <span>{row.original.stock}</span>,
+        },
+        {
+            id: "images",
+            header: "Gambar",
             cell: ({ row }) => (
                 <div className="inline-flex items-center gap-2">
-                    <Image priority src={getImageUrl(row.original.logo)} alt={row.original.name} width={100} height={100} />
+                    <Image
+                        priority
+                        src={getImageUrl(row.original.images[0], 'products')}
+                        alt={row.original.name}
+                        width={100}
+                        height={100}
+                        className="object-cover"
+                    />
                     <span>{row.original.name}</span>
                 </div>
             ),
@@ -238,8 +178,7 @@ export function DataTable({
                         <DropdownMenuItem
                             onClick={() => {
                                 setEditData(row.original);
-                                setEditPreview(getImageUrl(row.original.logo)); // tambahkan baris ini
-                                setEditDialogOpen(true);
+                                // setEditDialogOpen(true);
                             }}
                         >
                             Edit
@@ -251,6 +190,22 @@ export function DataTable({
             )
         },
     ];
+     // handleDelete Product 
+        async function handleDelete(id: number) {
+            setLoading(true);
+            const result = await deleteProduct(null, new FormData(), id);
+            setLoading(false);
+    
+            if (result?.error) {
+                toast.error(result.error);
+            } else {
+                toast.success("Product berhasil dihapus!");
+                // Fetch ulang data setelah berhasil hapus
+                const newData = await getProducts();
+                setData(newData);
+            }
+        }
+    
 
 
     const [rowSelection, setRowSelection] = React.useState({})
@@ -303,72 +258,13 @@ export function DataTable({
             className="w-full flex-col justify-start gap-6"
         >
             <div className="flex items-center justify-end px-4 lg:px-6">
-                {/* Tambah Brand */}
-                <ReusableDialog
-                    triggerLabel="Tambah Brand"
-                    title="Tambah Brand"
-                    description="Isi data brand baru di bawah ini."
-                    submitLabel="Simpan"
-                    cancelLabel="Batal"
-                    onSubmit={handleSubmit}
-                >
-                    <div className="grid gap-3">
-                        <div>
-                            <Label htmlFor="name">Nama Brand</Label>
-                            <Input id="name" name="name" required />
-                        </div>
-                        <div>
-                            <Label htmlFor="image">Pilih Gambar</Label>
-                            <Input id="image" name="image" type="file" accept="image/*" required />
-
-                        </div>
-                    </div>
-                </ReusableDialog>
-
-                {/* Edit Brand */}
-                <ReusableDialog
-                    open={editDialogOpen}
-                    setOpen={setEditDialogOpen}
-                    title="Edit Brand"
-                    triggerLabel=""
-                    description="Edit data brand di bawah ini."
-                    submitLabel="Simpan"
-                    cancelLabel="Batal"
-                    onSubmit={handleEditSubmit}
-                >
-                    <div className="grid gap-3">
-                        <Label htmlFor="edit-brand-name">Nama Brand</Label>
-                        <Input
-                            id="edit-brand-name"
-                            name="name"
-                            defaultValue={editData?.name}
-                            required
-                        />
-                        <Label htmlFor="edit-brand-image">Gambar Brand</Label>
-                        <Input
-                            id="edit-brand-image"
-                            name="image"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleEditImageChange}
-                        />
-                        <span className="text-xs text-muted-foreground">
-                            Kosongkan jika tidak ingin mengganti gambar
-                        </span>
-                        {editPreview && (
-                            <Image
-                                src={editPreview}
-                                alt="Preview"
-                                width={100}
-                                height={100}
-                                className="mt-2 rounded"
-                            />
-                        )}
-                        {/* HAPUS baris ini: */}
-                        {/* <input type="hidden" name="image" value={editData?.logo} /> */}
-                    </div>
-                </ReusableDialog>
-
+                <div>
+                    <Link href="/dashboard/products/create">
+                        <Button variant="outline" >
+                            Tambah Product
+                        </Button>
+                    </Link>
+                </div>
             </div>
             <TabsContent
                 value="outline"

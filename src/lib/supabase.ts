@@ -9,11 +9,11 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export const getImageUrl = (name: string) => {
+export const getImageUrl = (name: string, path: 'brands' | 'products' = 'brands') => {
     const { data } = supabase
         .storage
         .from('belanja')
-        .getPublicUrl(`public/brands/${name}`)
+        .getPublicUrl(`public/${path}/${name}`)
 
     return data.publicUrl
 }
@@ -30,3 +30,12 @@ export const uploadFile = async (file: File, path: 'brands' | 'products' = 'bran
     if (error) throw error; // biar ketangkep try/catch di action
     return fileName;
 };
+
+export const deleteFile = async (
+    filename: string,
+    path: 'brands' | 'products' = 'brands'
+) => {
+    await supabase.storage
+        .from('belanja')
+        .remove([`public/${path}/${filename}`]);
+}
