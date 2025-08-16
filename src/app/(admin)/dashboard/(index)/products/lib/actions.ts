@@ -306,3 +306,26 @@ export async function deleteProduct(
         return { error: "Product gagal dihapus" };
     }
 }
+
+export async function getProductById(id: number) {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                stock: true,
+                images: true,
+                category_id: true,
+                brand_id: true,
+                location_id: true,
+            },
+        });
+        return product;
+    } catch (error) {
+        console.error("Error fetching product:", error);
+        return null;
+    }
+}

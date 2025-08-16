@@ -70,18 +70,18 @@ import {
 import Link from "next/link"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/supabase"
-import { getProducts } from "../lib/data"
-import { deleteProduct } from "../lib/actions"
 import { redirect } from "next/navigation"
 
+// Schema sesuai dengan data orders
 export const schema = z.object({
     id: z.number(),
-    name: z.string(),
-    brand: z.string(),
-    category: z.string(),
+    customerName: z.string(),
     price: z.number(),
-    stock: z.string(),          // ubah ke string
-    images: z.array(z.string()), // ubah ke array
+    products: z.array(z.object({
+        name: z.string(),
+        image: z.string()
+    })),
+    status: z.string(),
 })
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
@@ -125,95 +125,65 @@ export function DataTable({
     const columns: ColumnDef<z.infer<typeof schema>>[] = [
         {
             id: 'ID',
-            header: 'ID',
-            cell: ({ row }) => <span>{row.original.id}</span>,
+            header: 'Order ID',
+            cell: ({ row }) => <span>#{row.original.id}</span>,
         },
         {
-            id: "name",
-            header: "Lokasi",
-            cell: ({ row }) => <span>{row.original.name}</span>,
+            id: "customerName",
+            header: "Customer",
+            cell: ({ row }) => <span className="font-medium">{row.original.customerName}</span>,
         },
         {
-            id: "category",
-            header: "Kategori",
-            cell: ({ row }) => <span>{row.original.category}</span>,
-        },
-        {
-            id: "price",
-            header: "Harga",
-            cell: ({ row }) => <span>{row.original.price}</span>,
-        },
-        {
-            id: "stock",
-            header: "Stok",
-            cell: ({ row }) => <span>{row.original.stock}</span>,
-        },
-        {
-            id: "images",
-            header: "Gambar",
+            id: "products",
+            header: "Products",
             cell: ({ row }) => (
-                <div className="inline-flex items-center gap-2">
-                    <Image
-                        priority
-                        src={getImageUrl(row.original.images[0], 'products')}
-                        alt={row.original.name}
-                        width={100}
-                        height={100}
-                        className="object-cover"
-                    />
-                    <span>{row.original.name}</span>
+                <div className="flex items-center gap-2">
+                    {row.original.products.slice(0, 3).map((product, index) => (
+                        <div key={index} className="flex items-center gap-1">
+                            <Image
+                                src={getImageUrl(product.image, 'products')}
+                                alt={product.name}
+                                width={40}
+                                height={40}
+                                className="object-cover rounded"
+                            />
+                            {index === 0 && (
+                                <span className="text-sm truncate max-w-[100px]">
+                                    {product.name}
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                    {row.original.products.length > 3 && (
+                        <span className="text-xs text-muted-foreground">
+                            +{row.original.products.length - 3} more
+                        </span>
+                    )}
                 </div>
             ),
         },
         {
-            id: "actions",
-            header: "Aksi",
+            id: "price",
+            header: "Total Price",
+            cell: ({ row }) => <span>${row.original.price.toFixed(2)}</span>,
+        },
+        {
+            id: "status",
+            header: "Status",
             cell: ({ row }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <IconDotsVertical />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem
-                            onClick={() => {
-                                openEditPage(row.original.id);
-                            }}
-                        >
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${row.original.status === 'completed'
+                    ? 'bg-green-100 text-green-800'
+                    : row.original.status === 'pending'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : row.original.status === 'cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                    }`}>
+                    {row.original.status}
+                </span>
+            ),
         },
     ];
-
-    // handle edit to navigate ke halaman edit
-    async function openEditPage(id: number) {
-        // navigate ke halaman edit
-        redirect(`/dashboard/products/edit/${id}`);
-    }
-
-    // handleDelete Product
-    async function handleDelete(id: number) {
-        setLoading(true);
-        const result = await deleteProduct(null, new FormData(), id);
-        setLoading(false);
-
-        if (result?.error) {
-            toast.error(result.error);
-        } else {
-            toast.success("Product berhasil dihapus!");
-            // Fetch ulang data setelah berhasil hapus
-            const newData = await getProducts();
-            setData(newData);
-        }
-    }
-
-
 
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] =
@@ -264,15 +234,6 @@ export function DataTable({
             defaultValue="outline"
             className="w-full flex-col justify-start gap-6"
         >
-            <div className="flex items-center justify-end px-4 lg:px-6">
-                <div>
-                    <Link href="/dashboard/products/create">
-                        <Button variant="outline" >
-                            Tambah Product
-                        </Button>
-                    </Link>
-                </div>
-            </div>
             <TabsContent
                 value="outline"
                 className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"

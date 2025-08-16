@@ -12,12 +12,10 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-    IconChevronDown,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
     IconChevronsRight,
-    IconDotsVertical,
 } from "@tabler/icons-react"
 import {
     ColumnDef,
@@ -35,17 +33,8 @@ import {
     VisibilityState,
 } from "@tanstack/react-table"
 
-import { toast } from "sonner"
 import { z } from "zod"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
     Select,
@@ -67,21 +56,15 @@ import {
     TabsContent,
 
 } from "@/components/ui/tabs"
-import Link from "next/link"
 import Image from "next/image"
 import { getImageUrl } from "@/lib/supabase"
-import { getProducts } from "../lib/data"
-import { deleteProduct } from "../lib/actions"
-import { redirect } from "next/navigation"
 
+// Schema sesuai dengan data customer
 export const schema = z.object({
     id: z.number(),
     name: z.string(),
-    brand: z.string(),
-    category: z.string(),
-    price: z.number(),
-    stock: z.string(),          // ubah ke string
-    images: z.array(z.string()), // ubah ke array
+    email: z.string(),
+    totalTransaction: z.number(),
 })
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
@@ -118,102 +101,35 @@ export function DataTable({
     // 
     const [data, setData] = React.useState(initialData);
 
-    const [loading, setLoading] = React.useState(false);
-    const [editData, setEditData] = React.useState<{ id: number; name: string } | null>(null);
-
     // Kolom actions harus di-DEFINISIKAN DI DALAM KOMPONEN agar bisa akses state!
     const columns: ColumnDef<z.infer<typeof schema>>[] = [
         {
             id: 'ID',
-            header: 'ID',
-            cell: ({ row }) => <span>{row.original.id}</span>,
+            header: 'Customer ID',
+            cell: ({ row }) => <span>#{row.original.id}</span>,
         },
         {
             id: "name",
-            header: "Lokasi",
-            cell: ({ row }) => <span>{row.original.name}</span>,
+            header: "Name",
+            cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
         },
         {
-            id: "category",
-            header: "Kategori",
-            cell: ({ row }) => <span>{row.original.category}</span>,
-        },
-        {
-            id: "price",
-            header: "Harga",
-            cell: ({ row }) => <span>{row.original.price}</span>,
-        },
-        {
-            id: "stock",
-            header: "Stok",
-            cell: ({ row }) => <span>{row.original.stock}</span>,
-        },
-        {
-            id: "images",
-            header: "Gambar",
+            id: "email",
+            header: "Email",
             cell: ({ row }) => (
-                <div className="inline-flex items-center gap-2">
-                    <Image
-                        priority
-                        src={getImageUrl(row.original.images[0], 'products')}
-                        alt={row.original.name}
-                        width={100}
-                        height={100}
-                        className="object-cover"
-                    />
-                    <span>{row.original.name}</span>
-                </div>
+                <span className="text-muted-foreground">{row.original.email}</span>
             ),
         },
         {
-            id: "actions",
-            header: "Aksi",
+            id: "totalTransaction",
+            header: "Total Orders",
             cell: ({ row }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <IconDotsVertical />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem
-                            onClick={() => {
-                                openEditPage(row.original.id);
-                            }}
-                        >
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {row.original.totalTransaction} orders
+                </span>
+            ),
         },
     ];
-
-    // handle edit to navigate ke halaman edit
-    async function openEditPage(id: number) {
-        // navigate ke halaman edit
-        redirect(`/dashboard/products/edit/${id}`);
-    }
-
-    // handleDelete Product
-    async function handleDelete(id: number) {
-        setLoading(true);
-        const result = await deleteProduct(null, new FormData(), id);
-        setLoading(false);
-
-        if (result?.error) {
-            toast.error(result.error);
-        } else {
-            toast.success("Product berhasil dihapus!");
-            // Fetch ulang data setelah berhasil hapus
-            const newData = await getProducts();
-            setData(newData);
-        }
-    }
-
-
 
     const [rowSelection, setRowSelection] = React.useState({})
     const [columnVisibility, setColumnVisibility] =
@@ -264,15 +180,6 @@ export function DataTable({
             defaultValue="outline"
             className="w-full flex-col justify-start gap-6"
         >
-            <div className="flex items-center justify-end px-4 lg:px-6">
-                <div>
-                    <Link href="/dashboard/products/create">
-                        <Button variant="outline" >
-                            Tambah Product
-                        </Button>
-                    </Link>
-                </div>
-            </div>
             <TabsContent
                 value="outline"
                 className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
