@@ -31,7 +31,23 @@ export const schemaSignin = z.object({
         })
         .min(6, { message: "Password must be at least 6 characters long" }),
 });
-
+export const schemaSignup = z.object({
+    name: nameString,
+       email: z
+        .string({
+            error: (issue) =>
+                issue.input === undefined ? "Email is required" : "Email must be a string",
+        })
+        .trim()
+        .min(1, { message: "Email is required" })
+        .email({ message: "Invalid email address" }),
+    password: z
+        .string({
+            error: (issue) =>
+                issue.input === undefined ? "Password is required" : "Password must be a string",
+        })
+        .min(6, { message: "Password must be at least 6 characters long" }),
+})
 // ================== MASTER DATA ==================
 export const schemaCategory = z.object({
     name: nameString,

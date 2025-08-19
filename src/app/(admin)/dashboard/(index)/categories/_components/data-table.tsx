@@ -2,37 +2,23 @@
 
 import * as React from "react"
 import {
-    closestCenter,
     DndContext,
-    KeyboardSensor,
-    MouseSensor,
-    TouchSensor,
-    useSensor,
-    useSensors,
-    type DragEndEvent,
     type UniqueIdentifier,
 } from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+
 import {
-    arrayMove,
+
     SortableContext,
     useSortable,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import {
-    IconChevronDown,
     IconChevronLeft,
     IconChevronRight,
     IconChevronsLeft,
     IconChevronsRight,
-    IconCircleCheckFilled,
     IconDotsVertical,
-    IconGripVertical,
-    IconLayoutColumns,
-    IconLoader,
-    IconPlus,
-    IconTrendingUp,
 } from "@tabler/icons-react"
 import {
     ColumnDef,
@@ -52,12 +38,7 @@ import {
 
 import { toast } from "sonner"
 import { z } from "zod"
-
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-
-import { Checkbox } from "@/components/ui/checkbox"
-
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -87,8 +68,6 @@ import {
 import {
     Tabs,
     TabsContent,
-    TabsList,
-    TabsTrigger,
 } from "@/components/ui/tabs"
 import { ReusableDialog } from "../../_components/ReusableDialog"
 import { deleteCategory, postCategory, updateCategory } from "../lib/actions"

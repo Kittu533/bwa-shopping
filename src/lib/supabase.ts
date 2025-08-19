@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 // filepath: [supabase.ts](http://_vscodecontentref_/1)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 
 // Create a single supabase client for interacting with your database
