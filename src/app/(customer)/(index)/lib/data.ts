@@ -1,5 +1,6 @@
 import { getImageUrl } from "@/lib/supabase";
 import prisma from "../../../../../lib/prisma";
+import { cookies } from "next/headers";
 
 // Fetch categories from the database
 export async function getCategories() {
@@ -41,7 +42,8 @@ export async function getMostPickProduct() {
 
     return mostPickedProducts.map((item) => ({
       ...item,
-      image_url: getImageUrl(item.images[0], "products"),
+      image_url: item.images, // <-- array of string (nama file gambar)
+      category_name: item.category.name,
     }));
   } catch (error) {
     console.error("Error fetching most picked products:", error);
@@ -68,14 +70,14 @@ export async function getNewReleaseProduct() {
 
     return newReleaseProducts.map((item) => ({
       ...item,
-      image_url: getImageUrl(item.images[0], "products"),
+      image_url: item.images, // <-- array of string (nama file gambar)
+      category_name: item.category.name,
     }));
   } catch (error) {
     console.error("Error fetching new release products:", error);
     return [];
   }
 }
-
 
 // fetch brands from the database
 export async function getBrands() {
@@ -89,7 +91,7 @@ export async function getBrands() {
     });
 
     return brands.map((item) => ({
-     ...item,
+      ...item,
       logo: getImageUrl(item.logo, "brands"),
     }));
   } catch (error) {
@@ -97,3 +99,7 @@ export async function getBrands() {
     return [];
   }
 }
+// export async function getUserFromSession() {
+//   const session = await getServerSession(authOptions);
+//   return session?.user || null;
+// }

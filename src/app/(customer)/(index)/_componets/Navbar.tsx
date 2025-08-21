@@ -1,16 +1,24 @@
+import { validateRequest } from "@/lib/auth";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const { session, user } = await validateRequest();
+
   return (
     <nav className="container max-w-[1130px] mx-auto flex items-center justify-between bg-[#0D5CD7] p-5 rounded-3xl">
       <div className="flex shrink-0">
-        <Image width={100} height={100} src="assets/logos/logo.svg" alt="icon" />
+        <Image
+          width={100}
+          height={100}
+          src="/assets/logos/logo.svg"
+          alt="icon"
+        />
       </div>
       <ul className="flex items-center gap-[30px]">
         <li className="hover:font-bold hover:text-[#FFC736] transition-all duration-300 font-bold text-[#FFC736]">
-          <Link href="/">Shop</Link>
+          <Link href="/catalogs">Shop</Link>
         </li>
         <li className="hover:font-bold hover:text-[#FFC736] transition-all duration-300 text-white">
           <Link href="/categories">Categories</Link>
@@ -23,23 +31,37 @@ export default function Navbar() {
         </li>
       </ul>
       <div className="flex items-center gap-3">
-        <Link href="cart.html">
+        <Link href="/cart">
           <div className="w-12 h-12 flex shrink-0">
-            <Image width={48} height={48} src="assets/icons/cart.svg" alt="icon" />
+            <Image
+              width={48}
+              height={48}
+              src="/assets/icons/cart.svg"
+              alt="icon"
+            />
           </div>
         </Link>
-        <Link
-          href="sign-in"
-          className="p-[12px_20px] bg-white rounded-full font-semibold"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="signup.html"
-          className="p-[12px_20px] bg-white rounded-full font-semibold"
-        >
-          Sign Up
-        </Link>
+        {user && user.role === "customer" ? (
+          <>
+            <p className="text-white">Hi, {user.name}</p>
+            <div className="w-[48px] h-[48px] flex shrink-0 rounded-full p-1 border border-[#E5E5E5] overflow-hidden">
+              <Image
+                src="/assets/photos/p4.png"
+                className="w-full h-full object-cover rounded-full"
+                alt="photo"
+                width={48}
+                height={48}
+              />
+            </div>
+          </>
+        ) : (
+          <Link
+            href="/sign-in"
+            className="p-[12px_20px] bg-white rounded-full font-semibold"
+          >
+            Sign In
+          </Link>
+        )}
       </div>
     </nav>
   );

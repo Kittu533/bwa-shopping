@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { getMostPickProduct } from "../lib/data";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/supabase";
 
 interface ListProductPickProps {
     title: React.ReactNode;
@@ -31,7 +32,7 @@ export default async function ListProductPick({ title }: ListProductPickProps) {
                 <Image
                   width={90}
                   height={90}
-                  src={item.image_url}
+                  src={getImageUrl(item.image_url?.[0], "products")}
                   className="w-full h-full object-contain"
                   alt="thumbnail"
                 />
