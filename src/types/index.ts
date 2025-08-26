@@ -11,3 +11,7 @@ export type Tproduct = {
   category_name: string;
   price: number;
 };
+
+export type Tparams ={
+  id:string
+}

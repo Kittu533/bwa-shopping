@@ -65,7 +65,7 @@ export async function getNewReleaseProduct() {
         category: { select: { name: true } },
         price: true,
       },
-      take: 10,
+      take: 10, 
     });
 
     return newReleaseProducts.map((item) => ({
