@@ -7,13 +7,14 @@ import PriceInfo from "./_components/price-info";
 import { Tparams } from "@/types";
 import { getProductById } from "./lib/data";
 import { redirect } from "next/navigation";
+import { validateRequest } from "@/lib/auth";
 
 interface DetailProductProps{
    params:Tparams;
 }
 
 export default async function DetailProductPage({ params }: DetailProductProps) {
-
+  const {session} = await validateRequest()
     const product = await getProductById(Number.parseInt(params.id))
 
 
@@ -199,7 +200,7 @@ export default async function DetailProductPage({ params }: DetailProductProps) 
               </div>
             </div>
           </div>
-            <PriceInfo item={{
+            <PriceInfo isLoggedIn={!!session} item={{
                 id:product.id,
                 name:product.name,
                 price: Number(product.price),
@@ -217,7 +218,7 @@ export default async function DetailProductPage({ params }: DetailProductProps) 
                   <span>New Arrivals</span> <br /> Latest Products
                 </>
               }
-            />
+            /> 
           </Suspense>
         </div>
       </>

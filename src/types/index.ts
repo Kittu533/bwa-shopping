@@ -1,8 +1,8 @@
 export type actionResult = {
-    success?: boolean
-    message?: string
-    error?: string
-}
+  success?: boolean;
+  message?: string;
+  error?: string;
+};
 
 export type Tproduct = {
   id: number;
@@ -10,8 +10,15 @@ export type Tproduct = {
   name: string;
   category_name: string;
   price: number;
+  
 };
 
-export type Tparams ={
-  id:string
-}
+export type Tparams = {
+  id: string;
+};
+
+export type Tedit = {
+  params: Tparams;
+};
+
+export type Tcart = Tproduct & { quantity: number };

@@ -1,11 +1,31 @@
-import { Tproduct } from "@/types";
+"use client"
+
+import { Button } from "@/components/ui/button";
+import { UseCart } from "@/hooks/use-cart";
+import { Tcart, Tproduct } from "@/types";
+import { useRouter } from "next/navigation";
+
 import React from "react";
 
 interface PriceInfoProps{
     item : Tproduct
+    isLoggedIn: boolean
 }
 
-export default function PriceInfo({ item }: PriceInfoProps) {
+export default function PriceInfo({ item, isLoggedIn }: PriceInfoProps) {
+ const {addProduct} = UseCart()
+
+ const router = useRouter()
+
+ const checkout = () =>{
+  const newCart: Tcart = {
+    ...item,
+    quantity: 1,
+  }
+  addProduct(newCart)
+  router.push('/cart')
+ }
+  
   return (
     <div className="w-[302px] flex flex-col shrink-0 gap-5 h-fit">
       <div className="w-full bg-white border border-[#E5E5E5] flex flex-col gap-[30px] p-[30px] rounded-3xl">
@@ -46,12 +66,13 @@ export default function PriceInfo({ item }: PriceInfoProps) {
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <a
-            href="cart.html"
+          <Button type="button"
+            onClick={checkout}
+            disabled={!isLoggedIn}
             className="p-[12px_24px] bg-[#0D5CD7] rounded-full text-center font-semibold text-white"
           >
             Add to Cart
-          </a>
+          </Button >
           <a
             href=""
             className="p-[12px_24px] bg-white rounded-full text-center font-semibold border border-[#E5E5E5]"

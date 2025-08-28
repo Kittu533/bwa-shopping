@@ -31,7 +31,7 @@ export default async function Navbar() {
         </li>
       </ul>
       <div className="flex items-center gap-3">
-        <Link href="/cart">
+        <Link href="/carta">
           <div className="w-12 h-12 flex shrink-0">
             <Image
               width={48}
